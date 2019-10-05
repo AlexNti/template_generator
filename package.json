@@ -1,12 +1,12 @@
 {
   "name": "simple-rest-template",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "index.js",
   "author": "ALex_Nti <a.ntitoras@gmail.com>",
   "license": "MIT",
   "bin": {
     "simple-rest-template": "index.js"
- },
+  },
   "dependencies": {
     "inquirer": "^7.0.0"
   }

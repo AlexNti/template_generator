@@ -1,10 +1,10 @@
 
 const winston = require('winston');
-var appRoot = require('app-root-path');
+const appRoot = require('app-root-path');
 
 const level = process.env.LOG_LEVEL || 'debug';
 
-var options = {
+const options = {
     file: {
       level: 'info',
       filename: `${appRoot}/logs/app.log`,

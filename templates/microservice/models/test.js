@@ -4,10 +4,10 @@
 /**
  * Created by alexn on 20/07/2017.
  */
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-var schema = new Schema({
+const schema = new Schema({
   players: [{ type: Schema.Types.ObjectId, ref: "tests" }],
   questions:{type:Array}
 });
