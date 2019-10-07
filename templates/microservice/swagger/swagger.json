@@ -9,27 +9,11 @@
     "/": {
       "get": {
         "tags": [
-          "geo"
+          "test"
         ],
-        "description": "Get location info by address.",
+        "description": "This is a test.",
         "produces": [
           "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "address",
-            "description": "The address to get the places from.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "language",
-            "description": "The language that your results will be(default. \"el\").",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
         ],
         "responses": {
           "200": {

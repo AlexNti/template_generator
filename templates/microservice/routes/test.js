@@ -12,12 +12,6 @@ const testController = require('../controllers/test');
  *     description: This is a test.
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: test
- *         description: test.
- *         in: path
- *         required: true
- *         type: string
  *     responses:
  *       200:
  *         description: successful operation
