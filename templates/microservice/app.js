@@ -13,6 +13,7 @@ const errorHandler = require('./controllers/errors/error');
 
 const app = express();
 const testRoutes = require('./routes/test');
+const swaggerRoutes = require('./routes/swagger')
 const winston = require('./Utils/logger');
 // view engine setup
 
@@ -23,13 +24,13 @@ app.use(helmet());
 // Preventing HTTP Parameter Pollution
 app.use(hpp());
 
-app.use(session({
-    name: 'SESS_ID',
-    secret: process.env.EXPRESS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
+// app.use(session({
+//     name: 'SESS_ID',
+//     secret: process.env.EXPRESS_SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: true,
   
-  }));
+//   }));
 
 app.use(logger('combined',{ stream: winston.stream }));
 app.use(express.json());
@@ -38,6 +39,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', testRoutes);
+app.use('/', swaggerRoutes);
 
 app.use(errorHandler);
 

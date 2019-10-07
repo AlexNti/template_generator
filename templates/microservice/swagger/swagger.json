@@ -1,0 +1,47 @@
+{
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "API documentation description"
+  },
+  "swagger": "2.0",
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "description": "Get location info by address.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "description": "The address to get the places from.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "language",
+            "description": "The language that your results will be(default. \"el\").",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": []
+}
