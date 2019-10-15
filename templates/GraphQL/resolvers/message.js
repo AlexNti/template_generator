@@ -1,7 +1,6 @@
 const { combineResolvers } = require('graphql-resolvers');
 
-// const pubsub = require('../subscription');
-// const  { EVENTS } = require('../subscription');
+const { EVENTS, pubsub } = require('../subscription');
 
 const { isAuthenticated, isMessageOwner } = require('./authorization');
 
@@ -44,48 +43,52 @@ const messageGQL = {
     message: async (parent, { id }, { models }) => await models.Message.findById(id),
   },
 
-  // Mutation: {
-  //   createMessage: combineResolvers(
-  //     isAuthenticated,
-  //     async (parent, { text }, { models, me }) => {
-  //       const message = await models.Message.create({
-  //         text,
-  //         userId: me.id,
-  //       });
+  Mutation: {
 
-  //       pubsub.publish(EVENTS.MESSAGE.CREATED, {
-  //         messageCreated: { message },
-  //       });
 
-  //       return message;
-  //     },
-  //   ),
+    createMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { text }, { models, me }) => {
+        const message = await models.Message.create({
+          text,
+          userId: me.id,
+          createdAt: new Date().setSeconds(new Date().getSeconds() + 1),
+        });
+        return message;
 
-  //   deleteMessage: combineResolvers(
-  //     isAuthenticated,
-  //     isMessageOwner,
-  //     async (parent, { id }, { models }) => {
-  //       const message = await models.Message.findById(id);
 
-  //       if (message) {
-  //         await message.remove();
-  //         return true;
-  //       } 
-  //         return false;
-        
-  //     },
-  //   ),
-  // },
+        // pubsub.publish(EVENTS.MESSAGE.CREATED, {
+        //   messageCreated: { message },
+        // });
+      },
+    ),
 
-  // Message: {
-  //   user: async (message, args, { loaders }) => await loaders.user.load(message.userId),
-  // },
+    deleteMessage: combineResolvers(
+      isAuthenticated,
+      isMessageOwner,
+      async (parent, { id }, { models }) => {
+        const message = await models.Message.findById(id);
 
-  // Subscription: {
-  //   messageCreated: {
-  //     subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
-  //   },
-  // },
+        if (message) {
+          await message.remove();
+          return true;
+        }
+        return false;
+      },
+    ),
+  },
+
+  Message: {
+    user: async (message, args, { loaders }) => {
+      return await loaders.user.load(message.userId.toString());
+    },
+  },
+
+  Subscription: {
+    messageCreated: {
+      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+    },
+  },
 };
 
 

@@ -1,6 +1,8 @@
 const { GraphQLDateTime } = require('graphql-iso-date');
 
 const userResolvers = require('./user');
+const messageResolvers = require('./message');
+
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
@@ -9,4 +11,5 @@ const customScalarResolver = {
 
 module.exports = [
   customScalarResolver,
+  messageResolvers,
   userResolvers];

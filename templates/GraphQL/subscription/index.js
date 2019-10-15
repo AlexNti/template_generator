@@ -7,5 +7,4 @@ const EVENTS = {
 };
 
 
-module.exports = new PubSub();
-module.exports = { EVENTS };
+module.exports = { EVENTS, pubSub: new PubSub() };
