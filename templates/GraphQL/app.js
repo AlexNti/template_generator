@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
+const { ApolloServer} = require('apollo-server-express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
-const session = require('express-session');
 const hpp = require('hpp');
 const cors = require('cors');
 const errorHandler = require('./controllers/errors/error');
 
 const app = express();
 const testRoutes = require('./routes/test');
-const swaggerRoutes = require('./routes/swagger')
+const swaggerRoutes = require('./routes/swagger');
 const winston = require('./Utils/logger');
 // view engine setup
 
@@ -23,16 +23,7 @@ app.use(cors());
 app.use(helmet());
 // Preventing HTTP Parameter Pollution
 app.use(hpp());
-
-// app.use(session({
-//     name: 'SESS_ID',
-//     secret: process.env.EXPRESS_SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-  
-//   }));
-
-app.use(logger('combined',{ stream: winston.stream }));
+app.use(logger('combined', { stream: winston.stream }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
