@@ -1,0 +1,31 @@
+{
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "API documentation description"
+  },
+  "swagger": "2.0",
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "test"
+        ],
+        "description": "This is a test.",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {},
+  "responses": {},
+  "parameters": {},
+  "securityDefinitions": {},
+  "tags": []
+}
