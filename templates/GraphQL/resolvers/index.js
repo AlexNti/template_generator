@@ -1,12 +1,12 @@
-import { GraphQLDateTime } from 'graphql-iso-date';
+const { GraphQLDateTime } = require('graphql-iso-date');
 
-import userResolvers from './user';
+const userResolvers = require('./user');
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
 };
 
-export default [
+
+module.exports = [
   customScalarResolver,
-  userResolvers,
-];
+  userResolvers];

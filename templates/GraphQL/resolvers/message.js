@@ -1,93 +1,92 @@
-import { combineResolvers } from 'graphql-resolvers';
-import { AuthenticationError, UserInputError } from 'apollo-server';
+const { combineResolvers } = require('graphql-resolvers');
 
-import { isAdmin, isAuthenticated } from './authorization';
+// const pubsub = require('../subscription');
+// const  { EVENTS } = require('../subscription');
 
-export default {
+const { isAuthenticated, isMessageOwner } = require('./authorization');
+
+const toCursorHash = (string) => Buffer.from(string).toString('base64');
+
+const fromCursorHash = (string) => Buffer.from(string, 'base64').toString('ascii');
+
+const messageGQL = {
   Query: {
-    users: async (parent, args, { models }) => {
-      return await models.User.find();
-    },
-    user: async (parent, { id }, { models }) => {
-      return await models.User.findById(id);
-    },
-    me: async (parent, args, { models, me }) => {
-      if (!me) {
-        return null;
-      }
-
-      return await models.User.findById(me.id);
-    },
-  },
-
-  Mutation: {
-    // signUp: async (
-    //   parent,
-    //   { username, email, password },
-    //   { models, secret },
-    // ) => {
-    //   const user = await models.User.create({
-    //     username,
-    //     email,
-    //     password,
-    //   });
-
-    //   return { token: createToken(user, secret, '30m') };
-    // },
-
-    signIn: async (
-      parent,
-      { login, password },
-      { models, secret },
-    ) => {
-      const user = await models.User.findByLogin(login);
-
-      if (!user) {
-        throw new UserInputError(
-          'No user found with this login credentials.',
-        );
-      }
-
-      const isValid = await user.validatePassword(password);
-
-      if (!isValid) {
-        throw new AuthenticationError('Invalid password.');
-      }
-
-      return { token: createToken(user, secret, '30m') };
-    },
-
-    updateUser: combineResolvers(
-      isAuthenticated,
-      async (parent, { username }, { models, me }) => {
-        return await models.User.findByIdAndUpdate(
-          me.id,
-          { username },
-          { new: true },
-        );
-      },
-    ),
-
-    deleteUser: combineResolvers(
-      isAdmin,
-      async (parent, { id }, { models }) => {
-        const user = await models.User.findById(id);
-
-        if (user) {
-          await user.remove();
-          return true;
-        } else {
-          return false;
+    messages: async (parent, { cursor, limit = 100 }, { models }) => {
+      const cursorOptions = cursor
+        ? {
+          createdAt: {
+            $lt: fromCursorHash(cursor),
+          },
         }
-      },
-    ),
+        : {};
+      const messages = await models.Message.find(
+        cursorOptions,
+        null,
+        {
+          sort: { createdAt: -1 },
+          limit: limit + 1,
+        },
+      );
+
+      const hasNextPage = messages.length > limit;
+      const edges = hasNextPage ? messages.slice(0, -1) : messages;
+
+      return {
+        edges,
+        pageInfo: {
+          hasNextPage,
+          endCursor: toCursorHash(
+            edges[edges.length - 1].createdAt.toString(),
+          ),
+        },
+      };
+    },
+    message: async (parent, { id }, { models }) => await models.Message.findById(id),
   },
 
-  User: {
-    messages: async (user, args, { models }) => {
-      return await models.Message.find({
-        userId: user.id,
-      });
-    },
-  },
+  // Mutation: {
+  //   createMessage: combineResolvers(
+  //     isAuthenticated,
+  //     async (parent, { text }, { models, me }) => {
+  //       const message = await models.Message.create({
+  //         text,
+  //         userId: me.id,
+  //       });
+
+  //       pubsub.publish(EVENTS.MESSAGE.CREATED, {
+  //         messageCreated: { message },
+  //       });
+
+  //       return message;
+  //     },
+  //   ),
+
+  //   deleteMessage: combineResolvers(
+  //     isAuthenticated,
+  //     isMessageOwner,
+  //     async (parent, { id }, { models }) => {
+  //       const message = await models.Message.findById(id);
+
+  //       if (message) {
+  //         await message.remove();
+  //         return true;
+  //       } 
+  //         return false;
+        
+  //     },
+  //   ),
+  // },
+
+  // Message: {
+  //   user: async (message, args, { loaders }) => await loaders.user.load(message.userId),
+  // },
+
+  // Subscription: {
+  //   messageCreated: {
+  //     subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+  //   },
+  // },
 };
+
+
+module.exports = messageGQL;

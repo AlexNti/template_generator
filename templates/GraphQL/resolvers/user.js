@@ -1,10 +1,21 @@
-import { combineResolvers } from 'graphql-resolvers';
-import { AuthenticationError, UserInputError } from 'apollo-server';
+const { combineResolvers } = require('graphql-resolvers');
+const { AuthenticationError, UserInputError } = require('apollo-server');
+const jwt = require('jsonwebtoken');
 
-import { isAdmin, isAuthenticated } from './authorization';
+const { isAdmin, isAuthenticated } = require('./authorization');
 
+const createToken = async (user, secret, expiresIn) => {
+  const {
+    id, email, username, role,
+  } = user;
+  return await jwt.sign({
+    id, email, username, role,
+  }, secret, {
+    expiresIn,
+  });
+};
 
-export default {
+const userGQL = {
   Query: {
     users: async (parent, args, { models }) => await models.User.find(),
     user: async (parent, { id }, { models }) => await models.User.findById(id),
@@ -16,6 +27,7 @@ export default {
       return await models.User.findById(me.id);
     },
   },
+
   Mutation: {
     signUp: async (
       parent,
@@ -55,13 +67,11 @@ export default {
 
     updateUser: combineResolvers(
       isAuthenticated,
-      async (parent, { username }, { models, me }) => {
-        return await models.User.findByIdAndUpdate(
-          me.id,
-          { username },
-          { new: true },
-        );
-      },
+      async (parent, { username }, { models, me }) => await models.User.findByIdAndUpdate(
+        me.id,
+        { username },
+        { new: true },
+      ),
     ),
 
     deleteUser: combineResolvers(
@@ -72,10 +82,17 @@ export default {
         if (user) {
           await user.remove();
           return true;
-        } else {
-          return false;
         }
+        return false;
       },
     ),
   },
+
+  User: {
+    messages: async (user, args, { models }) => await models.Message.find({
+      userId: user.id,
+    }),
+  },
 };
+
+module.exports = userGQL;

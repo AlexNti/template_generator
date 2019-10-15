@@ -1,6 +1,6 @@
-import { gql } from 'apollo-server-express';
+const { gql } = require('apollo-server-express');
 
-export default gql`
+const message = gql`
   extend type Query {
     messages(cursor: String, limit: Int): MessageConnection!
     message(id: ID!): Message!
@@ -36,3 +36,5 @@ export default gql`
     message: Message!
   }
 `;
+
+module.exports = message;
